@@ -2,10 +2,8 @@
 Stored price data analysis script
 Analyzes arbitrage opportunity statistics from CSV and SQLite DB
 
-Author: apemoonspin
-Telegram: @apemoonspin
-GitHub: apemoonspin
-Twitter: @apemoonspin
+Author: q10000010
+Telegram: @q10000010
 """
 import sqlite3
 import pandas as pd

@@ -1,11 +1,9 @@
-# Polymarket Arbitrage Bot | Polymarket Trading Bot | Polymarket Arbitrage Trading Bot
+# Polymarket Arbitrage Bot | Polymarket Trading Bot with 7 Strategies
 
 **Professional Polymarket Bot for Automated Arbitrage Trading for suitable income**
 
 > **Need help running this project or want an updated version?**  
-> 📱 **Telegram**: [@apemoonspin](https://t.me/apemoonspin)  
-> 🐦 **Twitter**: [@apemoonspin](https://twitter.com/apemoonspin)
-
+> 📱 **Telegram**: [t.me/q10000010](https://t.me/q10000010)  
 ---
 
 ## 📝 Description
@@ -13,10 +11,6 @@
 **Polymarket Arbitrage Bot** - The ultimate automated trading solution for Polymarket arbitrage opportunities. This **Polymarket trading bot** automatically scans markets, detects arbitrage opportunities, and executes profitable trades when Yes/No ticket prices sum to less than 1.0.
 
 **Current Version Update**: This version specifically addresses and resolves the critical 3.15% profit margin calculation issue, ensuring more accurate arbitrage detection and execution.
-
-### What is a Polymarket Arbitrage Bot?
-
-A **Polymarket arbitrage bot** is an automated trading system designed to identify and capitalize on price discrepancies in Polymarket prediction markets. This **Polymarket arbitrage trading bot** monitors real-time prices across multiple markets, detects when the combined cost of Yes and No tickets is below their redemption value, and automatically executes trades to lock in guaranteed profits.
 
 ---
 
@@ -34,7 +28,7 @@ Combines the best strategies from CRYINGLITTLEBABY, PolyFlashBot,  Dutch Book bo
 ### High Speed, Low Stress
 **Trades thousands of micro-opportunities automatically.** Set it up, let it run, and watch it work. This **Polymarket arbitrage bot** handles the complexity so you don't have to.
 
-> **Ready to get started?** Contact the author via Telegram, or Twitter for setup assistance and access to advanced features.
+> **Ready to get started?** Contact the author via Telegram for setup assistance and access to advanced features.
 
 ---
 
@@ -43,29 +37,41 @@ Combines the best strategies from CRYINGLITTLEBABY, PolyFlashBot,  Dutch Book bo
 I implemented these **7 Polymarket arbitrage trading strategies**  for premium version:
 
 1. **Strategy 1**: Liquidity Absorption Flip  
-Overview: Build a large low-cost position by soaking bot liquidity, then briefly force the reference market price at resolution to flip the outcome and cash the higher Polymarket payout.
+This strategy targets markets dominated by bots and high-frequency traders. You accumulate positions at low prices, allowing bots to lift your average entry. Seconds before resolution, a targeted price push flips the outcome, capturing the payout spread. It’s not about speed — it’s about structure and capital.
+
+Example: Buy a market at $0.40, bots push it to $0.50 on average, then a last-second price move flips the final outcome → maximized payout.
 
 
 2. **Strategy 2**: Orderbook Parity Arbitrage (Pre-Fee Era)  - <span style="background-color: #4CAF50; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold;">Current repo's plan</span>  
-Overview: Exploited brief moments where YES + NO priced below $1 on short windows, buying both sides simultaneously and holding to settlement to harvest tiny, repeatable mispricings—an edge erased by the 3.15% fee.  
-Contrast — Post-Fee Adaptation: Liquidation Momentum Filter  
-Overview: After fees killed parity arbitrage, the surviving bot shifted to entering only during forced-liquidation spikes, trading explosive moves where payout asymmetry outweighed fees, proving the edge wasn’t speed but adaptive logic.
+Sometimes YES + NO prices briefly sum to less than $1. Bots exploit this by simultaneously buying both sides, guaranteeing profit at settlement. After fees like 3.15% were introduced, this strategy adapted by filtering for explosive price movements or liquidation events.
+
+Example: YES $0.48 + NO $0.48 → buy both → settle = $1 payout → profit $0.04 per unit.
+
 
 3. **Strategy 3**: Structural Spread Lock  
-Overview: Trade short-duration Polymarket markets by exploiting order-book imbalances—buying both sides during panic mispricing and holding to settlement to capture the guaranteed spread minus fees, independent of market direction
+The bot ignores market direction completely. It monitors the orderbook for panic mispricing and buys both sides when pricing breaks. At settlement, one side pays $1 and the other $0, locking in a profit. Discipline and timing beat prediction.
+
+Example: YES $0.48 + NO $0.48 → buy both → settle = guaranteed profit minus fees.
 
 4. **Strategy 4**: Systematic NO Farming  
-Overview: Consistently bet NO on overhyped outcomes, exploiting the fact that most prediction markets statistically resolve to NO while the crowd overpays for unlikely “miracle” outcomes.
+Most traders chase “moonshots” and overhyped outcomes. Statistically, ~70% of prediction markets resolve NO. By consistently betting NO, you exploit crowd overreaction while maintaining a high win rate. Reality pays more than narratives.
+
+Example: Everyone bets UP on a viral meme coin → you bet NO → win most of the time.
 
 5. **Strategy 5**:  Long-Shot Floor Buying  
-Overview: Buy YES shares at the absolute minimum price (≈0.1¢) across thousands of markets, capping downside per bet while relying on rare but inevitable long-shot resolutions to generate asymmetric upside.
+This counterintuitive approach places tiny bets (e.g., $0.01) on extremely low probability outcomes. The downside is minimal, but rare wins produce asymmetric upside. Across thousands of markets, even a handful of YES resolutions can yield profit.
+
+Example: $0.01 YES bet on a 0.01% chance → a rare win covers hundreds of tiny losses.
 
 6. **Strategy 6**: Spread Farming  
-Overview: Use a high-frequency bot on Polymarket’s CLOB to repeatedly buy at the bid and sell at the ask, capturing tiny spreads thousands of times per day—sometimes hedged across platforms to neutralize price risk.
+Automated bots focus on high-probability contracts priced $0.90–$0.99. Thousands of micro-trades accumulate over time, compounding small wins into significant returns. Best for short-duration crypto markets like BTC or ETH.
 
+Example: Buy YES at $0.05, sell at $0.06, repeat 10,000 times → consistent small profits add up.
 
 7. **Strategy 7**: High-Probability Auto-Compounding  
 Overview: A fully automated bot repeatedly trades short-duration crypto up/down markets by buying high-probability contracts (≈$0.90–$0.99), capturing small spreads and incentives thousands of times a day to compound returns purely through execution and scale.
+
+Example: Buy $0.95 YES → settle $1 → repeat thousands of times → automated profit growth.
 
 > **Note**: Many advanced trading strategies are implemented in this **Polymarket arbitrage bot**. To access the full feature set and detailed strategy documentation, please contact the author via the channels above.
 
@@ -206,7 +212,7 @@ python3 analyze_data.py 24 --export
 
 For detailed terminal commands, see [COMMANDS.md](COMMANDS.md).
 
-> **Need help?** Contact the author via Telegram, GitHub, or Twitter for setup assistance or updated versions of this Polymarket trading bot.
+> **Need help?** Contact the author via Telegram for setup assistance or updated versions of this Polymarket trading bot.
 
 ---
 
@@ -241,10 +247,8 @@ This project is freely available for educational purposes.
 
 ## 👤 Author
 
-**apemoonspin**  
-📱 Telegram: [@apemoonspin](https://t.me/apemoonspin)  
-🐙 GitHub: [apemoonspin](https://github.com/apemoonspin)  
-🐦 Twitter: [@apemoonspin](https://twitter.com/apemoonspin)
+**q10000010**  
+📱 Telegram: [@q10000010](https://t.me/q10000010)  
 
 ---
 
@@ -269,4 +273,4 @@ This **Polymarket arbitrage trading bot** includes many advanced strategies and 
 - Multi-market parallel processing
 - Risk management features
 
-**Contact the author** via Telegram, GitHub, or Twitter (see top of README).
+**Contact the author** via Telegram (see top of README).

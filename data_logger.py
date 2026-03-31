@@ -2,10 +2,8 @@
 Polymarket Price Data Logger
 Saves price data to CSV and SQLite DB for arbitrage opportunity analysis
 
-Author: apemoonspin
-Telegram: @apemoonspin
-GitHub: apemoonspin
-Twitter: @apemoonspin
+Author: q10000010
+Telegram: @q10000010
 """
 import csv
 import sqlite3
