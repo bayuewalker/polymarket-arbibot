@@ -17,3 +17,16 @@ LOG_DIR=./logs                   # Log file storage directory
 # Trading Settings
 MIN_TRADE_SIZE=0.01              # Minimum trade amount
 MAX_SLIPPAGE=0.01                # Maximum slippage (1% = 0.01)
+
+# Strategy 5: Long-Shot Floor Buying (optional)
+ENABLE_STRATEGY_5=false
+STRATEGY_5_MAX_PRICE=0.001
+STRATEGY_5_BET_SIZE=0.01
+STRATEGY_5_MAX_MARKETS=1000
+STRATEGY_5_MIN_PROBABILITY=0.0001
+
+# Telegram Bot Control (required for main.py)
+TELEGRAM_BOT_TOKEN=              # From @BotFather on Telegram
+TELEGRAM_CHAT_ID=                # Your numeric chat ID (get from @userinfobot)
+BOT_AUTO_START=false             # true = scanning starts automatically on launch
+STATS_INTERVAL_HOURS=1.0         # How often to send periodic stats (hours)
