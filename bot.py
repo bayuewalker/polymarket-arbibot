@@ -30,9 +30,14 @@ from config import (
     STRATEGY_5_MAX_PRICE,
     STRATEGY_5_BET_SIZE,
     STRATEGY_5_MAX_MARKETS,
-    STRATEGY_5_MIN_PROBABILITY
+    STRATEGY_5_MIN_PROBABILITY,
+    PAPER_TRADING,
+    PAPER_BALANCE,
+    PAPER_TRADE_SIZE,
+    PAPER_DB_FILE,
 )
 from data_logger import DataLogger
+from paper_trader import PaperTrader
 
 
 class PolyArbitrageBot:
@@ -71,6 +76,12 @@ class PolyArbitrageBot:
         self.strategy_5_max_markets = STRATEGY_5_MAX_MARKETS
         self.strategy_5_min_probability = STRATEGY_5_MIN_PROBABILITY
         self.strategy_5_active_positions = {}  # Track active Strategy 5 positions
+
+        # Paper trading
+        self.paper_trader = None
+        if PAPER_TRADING:
+            self.paper_trader = PaperTrader(PAPER_DB_FILE, PAPER_BALANCE, PAPER_TRADE_SIZE)
+            print(f"[📝] Paper trading ON | Balance: ${self.paper_trader.get_balance():.2f} | Trade size: ${PAPER_TRADE_SIZE:.2f}")
 
         # Telegram integration support
         self.running = False
@@ -340,42 +351,44 @@ class PolyArbitrageBot:
             'bet_size': self.strategy_5_bet_size
         }
     
-    def execute_trade(self, market_id: str, yes_price: float, no_price: float) -> bool:
-        """
-        Execute arbitrage trade
-        
-        For actual implementation:
-        1. Sign and send orders via CLOB API
-        2. Send transactions via Web3
-        3. Check order status and slippage
-        
-        Currently in simulation mode
-        """
-        if not self.account or not self.web3:
-            print("[!] Wallet not connected. Cannot execute trades.")
+    def execute_trade(self, market_id: str, yes_price: float, no_price: float,
+                      market_question: str = "") -> bool:
+        """Execute arbitrage trade (paper trading or live)."""
+        # Paper trading mode
+        if self.paper_trader:
+            trade = self.paper_trader.open_trade(market_id, market_question, yes_price, no_price)
+            if trade:
+                print(
+                    f"[📝] Paper trade executed | "
+                    f"Cost: ${trade['cost']:.2f} | "
+                    f"Profit: ${trade['gross_profit']:.4f} ({trade['profit_pct']:.2f}%) | "
+                    f"Balance: ${trade['balance_after']:.2f}"
+                )
+                self._notify(
+                    f"📝 PAPER TRADE EXECUTED\n"
+                    f"Market: {market_question or market_id}\n"
+                    f"Yes: ${yes_price:.4f} | No: ${no_price:.4f}\n"
+                    f"Cost: ${trade['cost']:.2f} → Profit: ${trade['gross_profit']:.4f} ({trade['profit_pct']:.2f}%)\n"
+                    f"Balance: ${trade['balance_after']:.2f}"
+                )
+                return True
+            else:
+                print("[!] Paper trade skipped — insufficient virtual balance.")
             return False
-        
+
+        # Live trading mode (wallet required)
+        if not self.account or not self.web3:
+            print("[!] Wallet not connected. Set PRIVATE_KEY to enable live trading.")
+            return False
+
         try:
-            # Actual implementation example:
-            # 1. Create Yes ticket buy order
-            # 2. Create No ticket buy order
-            # 3. Send both orders simultaneously (Atomic Arbitrage)
-            # 4. Check order status
-            
-            print(f"[*] Trade execution simulation:")
-            print(f"    Market ID: {market_id}")
-            print(f"    Yes ticket buy: ${yes_price:.4f}")
-            print(f"    No ticket buy: ${no_price:.4f}")
-            print(f"    Total cost: ${yes_price + no_price:.4f}")
-            print(f"    Expected profit: ${1.0 - (yes_price + no_price):.4f}")
-            
-            # Add CLOB API call code here for actual implementation
+            # TODO: implement via py_clob_client
             # from py_clob_client.client import ClobClient
             # client = ClobClient(...)
             # client.create_order(...)
-            
-            return True
-        
+            print(f"[*] Live trade not implemented yet. Use paper trading mode.")
+            return False
+
         except Exception as e:
             print(f"[✗] Trade execution failed: {e}")
             return False
@@ -426,9 +439,9 @@ class PolyArbitrageBot:
                 market_id=market_id
             )
 
-            # Execute trade
-            if self.account:
-                self.execute_trade(market_id, yes_price, no_price)
+            # Execute trade (paper or live)
+            if self.paper_trader or self.account:
+                self.execute_trade(market_id, yes_price, no_price, market_question)
 
         # Check for Strategy 5: Long-Shot Floor Buying opportunity
         if self.strategy_5_enabled:

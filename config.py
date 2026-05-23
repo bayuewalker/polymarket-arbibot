@@ -43,6 +43,12 @@ STRATEGY_5_BET_SIZE = float(os.getenv("STRATEGY_5_BET_SIZE", "0.01"))  # Bet siz
 STRATEGY_5_MAX_MARKETS = int(os.getenv("STRATEGY_5_MAX_MARKETS", "1000"))  # Maximum markets to bet on simultaneously
 STRATEGY_5_MIN_PROBABILITY = float(os.getenv("STRATEGY_5_MIN_PROBABILITY", "0.0001"))  # Minimum probability threshold (0.01%)
 
+# Paper Trading settings
+PAPER_TRADING = os.getenv("PAPER_TRADING", "true").lower() == "true"
+PAPER_BALANCE = float(os.getenv("PAPER_BALANCE", "1000.0"))   # Starting virtual USDC
+PAPER_TRADE_SIZE = float(os.getenv("PAPER_TRADE_SIZE", "10.0"))  # Per-trade size in USDC
+PAPER_DB_FILE = os.path.join(LOG_DIR, "paper_trades.db")
+
 # Telegram Bot settings
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = int(os.getenv("TELEGRAM_CHAT_ID", "0"))

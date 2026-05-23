@@ -18,6 +18,11 @@ LOG_DIR=./logs                   # Log file storage directory
 MIN_TRADE_SIZE=0.01              # Minimum trade amount
 MAX_SLIPPAGE=0.01                # Maximum slippage (1% = 0.01)
 
+# Paper Trading (simulate trades without real funds)
+PAPER_TRADING=true               # true = paper mode, false = live trading
+PAPER_BALANCE=1000.0             # Starting virtual USDC balance
+PAPER_TRADE_SIZE=10.0            # Virtual trade size per opportunity (USDC)
+
 # Strategy 5: Long-Shot Floor Buying (optional)
 ENABLE_STRATEGY_5=false
 STRATEGY_5_MAX_PRICE=0.001
