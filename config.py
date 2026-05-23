@@ -42,3 +42,9 @@ STRATEGY_5_MAX_PRICE = float(os.getenv("STRATEGY_5_MAX_PRICE", "0.001"))  # Maxi
 STRATEGY_5_BET_SIZE = float(os.getenv("STRATEGY_5_BET_SIZE", "0.01"))  # Bet size per market ($0.01)
 STRATEGY_5_MAX_MARKETS = int(os.getenv("STRATEGY_5_MAX_MARKETS", "1000"))  # Maximum markets to bet on simultaneously
 STRATEGY_5_MIN_PROBABILITY = float(os.getenv("STRATEGY_5_MIN_PROBABILITY", "0.0001"))  # Minimum probability threshold (0.01%)
+
+# Telegram Bot settings
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = int(os.getenv("TELEGRAM_CHAT_ID", "0"))
+BOT_AUTO_START = os.getenv("BOT_AUTO_START", "false").lower() == "true"
+STATS_INTERVAL_HOURS = float(os.getenv("STATS_INTERVAL_HOURS", "1.0"))

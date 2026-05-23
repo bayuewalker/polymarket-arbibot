@@ -71,7 +71,33 @@ class PolyArbitrageBot:
         self.strategy_5_max_markets = STRATEGY_5_MAX_MARKETS
         self.strategy_5_min_probability = STRATEGY_5_MIN_PROBABILITY
         self.strategy_5_active_positions = {}  # Track active Strategy 5 positions
+
+        # Telegram integration support
+        self.running = False
+        self._notification_callback = None
+        self._loop = None
+        self._start_time = None
+        self._last_notified = {}  # market_id -> datetime, throttle 1 notif per 5 min
     
+    def set_callback(self, callback, loop):
+        """Register async notification callback from TelegramHandler."""
+        self._notification_callback = callback
+        self._loop = loop
+
+    def _notify(self, message: str, market_id: str = ""):
+        """Fire-and-forget notification to Telegram, with 5-min per-market throttle."""
+        from datetime import timedelta
+        now = datetime.now()
+        if market_id:
+            last = self._last_notified.get(market_id)
+            if last and (now - last) < timedelta(minutes=5):
+                return
+            self._last_notified[market_id] = now
+        if self._notification_callback and self._loop and self._loop.is_running():
+            asyncio.run_coroutine_threadsafe(
+                self._notification_callback(message), self._loop
+            )
+
     def get_active_markets(self, limit: int = MAX_MARKETS_TO_MONITOR) -> List[Dict[str, Any]]:
         """Query active market list"""
         try:
@@ -401,21 +427,76 @@ class PolyArbitrageBot:
             print(f"    Expected profit: ${profit:.4f} ({profit*100:.2f}%)")
             print(f"{'='*60}\n")
             
+            # Send Telegram notification
+            self._notify(
+                f"🎯 ARBITRAGE OPPORTUNITY\n"
+                f"Market: {market_question or market_id}\n"
+                f"Yes: ${yes_price:.4f} | No: ${no_price:.4f}\n"
+                f"Profit: {profit*100:.2f}%",
+                market_id=market_id
+            )
+
             # Execute trade
             if self.account:
                 self.execute_trade(market_id, yes_price, no_price)
-        
+
         # Check for Strategy 5: Long-Shot Floor Buying opportunity
         if self.strategy_5_enabled:
             has_strategy_5, upside_multiplier = self.check_strategy_5_opportunity(yes_price, no_price, market_id)
-            
+
             if has_strategy_5:
                 # Execute Strategy 5 trade
                 if self.account:
-                    self.execute_strategy_5_trade(market_id, yes_price, market_question)
+                    executed = self.execute_strategy_5_trade(market_id, yes_price, market_question)
+                    if executed:
+                        upside = 1.0 / yes_price if yes_price > 0 else 0
+                        self._notify(
+                            f"⚡ STRATEGY 5 OPPORTUNITY\n"
+                            f"Market: {market_question or market_id}\n"
+                            f"YES price: ${yes_price:.6f}\n"
+                            f"Upside: {upside:.1f}x",
+                            market_id=market_id
+                        )
         
         return has_opportunity
     
+    def run_threaded(self):
+        """Blocking scan loop for background thread. Exits when self.running=False."""
+        print("=" * 60)
+        print("Polymarket Arbitrage Bot Scanning Started")
+        print("=" * 60)
+
+        if not self.market_ids:
+            print("[*] Searching for active markets...")
+            markets = self.get_active_markets()
+            self.market_ids = [m['id'] for m in markets]
+            market_questions = {m['id']: m['question'] for m in markets}
+        else:
+            market_questions = {mid: "" for mid in self.market_ids}
+
+        if not self.market_ids:
+            print("[✗] No markets found.")
+            self.running = False
+            return
+
+        self._start_time = datetime.now()
+        print(f"[✓] Monitoring {len(self.market_ids)} markets")
+        print(f"[*] Min profit: {self.min_profit_margin*100:.1f}% | Interval: {self.scan_interval}s")
+        print("-" * 60)
+
+        while self.running:
+            for market_id in self.market_ids:
+                if not self.running:
+                    break
+                try:
+                    self.monitor_market(market_id, market_questions.get(market_id, ""))
+                except Exception as e:
+                    print(f"[✗] Market error ({market_id}): {e}")
+                    continue
+            time.sleep(self.scan_interval)
+
+        print("[*] Arbitrage scanning stopped.")
+
     def run(self):
         """Bot execution main loop"""
         print("="*60)
