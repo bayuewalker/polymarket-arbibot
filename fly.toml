@@ -1,39 +1,14 @@
-# fly.toml app configuration file generated for polyarbibot on 2026-05-23T20:04:02Z
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
-app = 'polyarbibot'
-primary_region = 'iad'
-
-[build]
+app = "polyarbibot"
+primary_region = "iad"
 
 [env]
-  PYTHONUNBUFFERED = '1'
+  PYTHONUNBUFFERED = "1"
 
 [[mounts]]
-  source = 'arbibot_logs'
-  destination = '/app/logs'
-
-[http_service]
-  internal_port = 8080
-  force_https = true
-  auto_stop_machines = 'stop'
-  auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
-
-[[services]]
-  protocol = 'tcp'
-  internal_port = 8080
-  ports = []
-
-  [services.concurrency]
-    hard_limit = 1
-    soft_limit = 1
+  source = "arbibot_logs"
+  destination = "/app/logs"
 
 [[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
+  cpu_kind = "shared"
   cpus = 1
   memory_mb = 512
