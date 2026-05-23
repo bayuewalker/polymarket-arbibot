@@ -164,18 +164,14 @@ class PolyArbitrageBot:
             response.raise_for_status()
             market_data = response.json()
             
-            # Also query orderbook data
-            orderbook = self.get_market_orderbook(market_id)
-            
             # Extract Yes/No ticket prices
-            # May need adjustment based on actual API response structure
             yes_price = None
             no_price = None
             yes_ask = None
             no_ask = None
             yes_bid = None
             no_bid = None
-            
+
             # Try extracting prices from Gamma API
             if 'outcomePrices' in market_data and 'outcomes' in market_data:
                 import json
@@ -200,12 +196,6 @@ class PolyArbitrageBot:
                             yes_price = float(prices[i])
                         elif outcome == 'No' and i < len(prices):
                             no_price = float(prices[i])
-            
-            # Try extracting orderbook from CLOB API
-            if orderbook:
-                # Parsing needed based on actual CLOB API response structure
-                # Example structure written here
-                pass
             
             # Use default values if prices are missing (error handling needed in production)
             if yes_price is None or no_price is None:
