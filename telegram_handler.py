@@ -51,6 +51,8 @@ class TelegramHandler:
         app.add_handler(CommandHandler("setinterval", self.cmd_setinterval))
         app.add_handler(CommandHandler("setmarkets",  self.cmd_setmarkets))
         app.add_handler(CommandHandler("strategy5",   self.cmd_strategy5))
+        app.add_handler(CommandHandler("paper",       self.cmd_paper))
+        app.add_handler(CommandHandler("reserpaper",  self.cmd_reserpaper))
         app.add_handler(CallbackQueryHandler(self.cmd_button_callback))
 
     # ------------------------------------------------------------------
@@ -86,6 +88,9 @@ class TelegramHandler:
                 InlineKeyboardButton("🏪 Markets",   callback_data="menu_markets"),
                 InlineKeyboardButton("🎯 S5 ON",     callback_data="s5_on"),
                 InlineKeyboardButton("🎯 S5 OFF",    callback_data="s5_off"),
+            ],
+            [
+                InlineKeyboardButton("📝 Paper Stats", callback_data="paper"),
             ],
         ])
 
@@ -213,6 +218,29 @@ class TelegramHandler:
             "All other controls are available as buttons ↓"
         )
 
+    async def _do_paper(self) -> str:
+        pt = self.arb_bot.paper_trader
+        if not pt:
+            return "Paper trading is disabled. Set PAPER_TRADING=true in .env"
+        s = pt.get_stats()
+        recent = pt.get_recent_trades(5)
+
+        sign = "+" if s["total_profit"] >= 0 else ""
+        msg = (
+            "📝 Paper Trading Stats\n"
+            f"Balance: ${s['balance']:.2f} (started ${s['starting_balance']:.2f})\n"
+            f"Total P&L: {sign}${s['total_profit']:.4f} ({sign}{s['total_return_pct']:.2f}%)\n"
+            f"Trades: {s['total_trades']} | Volume: ${s['total_volume']:.2f}\n"
+            f"Avg profit/trade: {s['avg_profit_pct']:.2f}% | Best: {s['max_profit_pct']:.2f}%"
+        )
+        if recent:
+            msg += "\n\nRecent trades:"
+            for t in recent:
+                ts = t["timestamp"][:16].replace("T", " ")
+                q = (t["market_question"] or "")[:30]
+                msg += f"\n• {ts} | +${t['gross_profit']:.4f} ({t['profit_pct']:.2f}%) | {q}"
+        return msg
+
     async def _do_strategy5(self, arg: str) -> str:
         if arg == "on":
             self.arb_bot.strategy_5_enabled = True
@@ -260,6 +288,26 @@ class TelegramHandler:
             return
         text = await self._do_settings()
         await update.message.reply_text(text, reply_markup=self._build_keyboard())
+
+    async def cmd_paper(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if not self._auth(update):
+            return
+        text = await self._do_paper()
+        await update.message.reply_text(text, reply_markup=self._build_keyboard())
+
+    async def cmd_reserpaper(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if not self._auth(update):
+            return
+        pt = self.arb_bot.paper_trader
+        if not pt:
+            await update.message.reply_text("Paper trading is disabled.")
+            return
+        from config import PAPER_BALANCE
+        pt.reset(PAPER_BALANCE)
+        await update.message.reply_text(
+            f"📝 Paper trading reset.\nNew balance: ${PAPER_BALANCE:.2f}",
+            reply_markup=self._build_keyboard()
+        )
 
     async def cmd_strategy5(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not self._auth(update):
@@ -384,6 +432,7 @@ class TelegramHandler:
                 "stats":    self._do_stats,
                 "settings": self._do_settings,
                 "help":     self._do_help,
+                "paper":    self._do_paper,
             }
             fn = dispatch.get(data)
             if fn:
